@@ -1,0 +1,9 @@
+blog/__pycache__
+blog/migrations
+blogpost/__pycache__
+env
+venv
+members/__pycache__
+members/migrations
+db.sqlite3
+.vscode
