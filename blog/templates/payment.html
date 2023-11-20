@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+<head>
+  <title>Payment Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 400px;
+      margin: 0 auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      text-align: center;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    input[type="text"],
+    input[type="number"],
+    input[type="tel"],
+    input[type="email"],
+    select {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 15px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      width: 100%;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .error-message {
+      color: red;
+      font-size: 0.8em;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Payment Page</h1>
+
+    <form id="payment-form" onsubmit="return validateForm()" action="{% url 'success_payment' %}">
+      <label for="card-number">Card Number</label>
+      <input type="text" id="card-number" placeholder="1234 5678 9012 3456" required>
+      <span class="error-message" id="card-error"></span>
+
+      <label for="expiry">Expiration Date</label>
+      <input type="text" id="expiry" placeholder="MM/YY" required>
+      <span class="error-message" id="expiry-error"></span>
+
+      <label for="cvv">CVV</label>
+      <input type="text" id="cvv" placeholder="123" required>
+      <span class="error-message" id="cvv-error"></span>
+
+      <label for="name">Cardholder Name</label>
+      <input type="text" id="name" placeholder="John Doe" required>
+      <span class="error-message" id="name-error"></span>
+
+      <button type="submit">Pay Now {{ Amount }}</button>
+    </form>
+  </div>
+
+  <script>
+    function validateForm() {
+      var cardNumber = document.getElementById('card-number').value;
+      var expiry = document.getElementById('expiry').value;
+      var cvv = document.getElementById('cvv').value;
+      var name = document.getElementById('name').value;
+
+      var cardError = document.getElementById('card-error');
+      var expiryError = document.getElementById('expiry-error');
+      var cvvError = document.getElementById('cvv-error');
+      var nameError = document.getElementById('name-error');
+
+      // Reset error messages
+      cardError.textContent = '';
+      expiryError.textContent = '';
+      cvvError.textContent = '';
+      nameError.textContent = '';
+
+      // Basic validation
+      var isValid = true;
+
+      if (!(/^\d{4} \d{4} \d{4} \d{4}$/.test(cardNumber))) {
+        cardError.textContent = 'Please enter a valid card number';
+        isValid = false;
+      }
+
+      if (!(/^\d{2}\/\d{2}$/.test(expiry))) {
+        expiryError.textContent = 'Please enter a valid expiration date (MM/YY)';
+        isValid = false;
+      }
+
+      if (!(/^\d{3}$/.test(cvv))) {
+        cvvError.textContent = 'Please enter a valid CVV';
+        isValid = false;
+      }
+
+      if (name.trim() === '') {
+        nameError.textContent = 'Please enter cardholder name';
+        isValid = false;
+      }
+
+      return isValid;
+    }
+  </script>
+</body>
+</html>
