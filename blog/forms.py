@@ -1,10 +1,15 @@
 from django import forms
 from .models import Post, Category
 
-choices = Category.objects.all().values_list('name','name')
-choice_list = []
-for item in choices:
-    choice_list.append(item)
+try:
+    choices = Category.objects.all().values_list('name','name')
+    choice_list = []
+    for item in choices:
+        choice_list.append(item)
+    choice_list=set(choice_list.extend(Category.CHOICES))
+except:
+    pass
+
 
 class PostForm(forms.ModelForm):
     
