@@ -7,6 +7,8 @@ from django.http import HttpResponseRedirect
 from datetime import date,datetime
 from dateutil.relativedelta import relativedelta
 from django.utils.timezone import now
+from blog.utils import user_must_be_subscribed
+from django.utils.decorators import method_decorator
 
 
 def like_view(request, pk):
@@ -90,6 +92,7 @@ class ArticleDetailView(DetailView):
         return context
     
 
+@user_must_be_subscribed
 def comment_post(request,pid):
     if not request.user.is_authenticated:
         return redirect('login')
@@ -102,10 +105,12 @@ def comment_post(request,pid):
     return redirect('article-detail', pid)
 
 
+@method_decorator(user_must_be_subscribed, name='dispatch')
 class AddPostView(CreateView):
     model = Post
     form_class = PostForm
     template_name = 'add_post.html'
+
 
 def sub(req):
     return render(req,'subscription.html')
@@ -118,12 +123,14 @@ class AddCategoryView(CreateView):
     fields = '__all__'
 
 
+@method_decorator(user_must_be_subscribed, name='dispatch')
 class UpdatePostView(UpdateView):
     model = Post
     form_class = EditForm
     template_name = 'update_post.html'
 
 
+@method_decorator(user_must_be_subscribed, name='dispatch')
 class DeletePostView(DeleteView):
     model = Post
     template_name = 'delete_post.html'

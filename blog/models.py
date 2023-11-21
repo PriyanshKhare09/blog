@@ -1,56 +1,67 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
-from datetime import date, datetime
 from ckeditor.fields import RichTextField
 from django.dispatch import receiver
 from django.db.models.signals import post_save 
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=255)
-
+    CHOICES = [
+        ("Other", "Other"),
+        ("Travel", "Travel"),
+        ("Food and Drink", "Food and Drink"),
+        ("Health and Fitness", "Health and Fitness"),
+        ("Technology", "Technology"),
+        ("Business and Finance", "Business and Finance"),
+        ("Personal Development", "Personal Development"),
+        ("Arts and Entertainment", "Arts and Entertainment"),
+        ("Sports", "Sports"),
+        ("News and Politics", "News and Politics"),
+        ("Lifestyle", "Lifestyle"),
+        ("Coding and Programming", "Coding and Programming"),
+        ("Science and Technology", "Science and Technology"),
+    ]
+    
+    name = models.CharField(max_length=255, choices=CHOICES, null=True, blank=True)
+    
     def __str__(self):
         return self.name
     
     def get_absolute_url(self):
         return reverse('home')
+
     
-# SUBSCRIPTION=(
-#      ('P','PRO'),
-#      ('S','STANDARD'),
-#      ('B','BASIC'),
-# )
+
 class Profile(models.Model):
     user = models.OneToOneField(User, null=True, on_delete=models.CASCADE)
-    bio=models.TextField(null=True)
-    is_premium=models.BooleanField(default=False)
+    bio = RichTextField(blank=False, null=True)
+    profile_pic = models.ImageField(null=True, blank=True, upload_to='images/profile/')
+    is_premium = models.BooleanField(default=False)
     premium_expiry_date=models.DateTimeField(null=True,blank=True)
     premium_status=models.BooleanField(default=False)
-    profile_pic = models.ImageField(null=True, blank=True, upload_to='images/profile/')
-    
-    
+
     def __str__(self):
         return str(self.user)
-    
-    @receiver(post_save, sender=User)
-    def create_user_profile(sender, instance, created, **kwargs):
-	    if created:
-		    Profile.objects.create(user=instance)
 
-    @receiver(post_save, sender=User) 
-    def save_user_profile(sender, instance, **kwargs):
-	    instance.profile.save()
-     
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
+
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+    instance.profile.save()
+    
 
 class Post(models.Model):
     title = models.CharField(max_length=255)
     header_image = models.ImageField(null=True, blank=True, upload_to='images/')
     author = models.ForeignKey(User, on_delete=models.CASCADE)
-    body = RichTextField(blank=True, null=True)
+    body = RichTextField(blank=False, null=True)
     post_date = models.DateField(auto_now_add=True)
     date_time = models.DateTimeField(auto_now_add=True, blank=True)
-    category = models.CharField(max_length=255)
+    category = models.CharField(max_length=255, null=True, blank=True)
     likes = models.ManyToManyField(User, related_name='blog_posts')
     
     def total_likes(self):
@@ -74,11 +85,12 @@ class Comment(models.Model):
 
     def __str__(self):
         return 'Comment by {}'.format(self.name)
-    
+     
+
 class Premium(models.Model):
-    plan_name=models.CharField(max_length=20)
-    plan_descrp=models.CharField(max_length=50)
-    plan_price=models.CharField(max_length=10)
+    plan_name = models.CharField(max_length=20)
+    plan_descrp = models.CharField(max_length=50)
+    plan_price = models.CharField(max_length=10)
 
     def __str__(self):
         return self.plan_name
