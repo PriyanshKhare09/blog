@@ -6,6 +6,7 @@
 
 {% block content %}
 {% if user.is_authenticated %}
+    {%if user.profile.is_premium %}
 <div class="container">
     <br>
     <h4>Add Post</h4>
@@ -20,8 +21,11 @@
     let name = "{{ user.id }}";
     document.getElementById("auth").value = name;
 </script>
-{% else %}
-You are not logged in!
+    {% else %}
+        Your don't have any Subscripton!!
+        <a href="{% url 'home' %}">Click Here</a>
 {% endif %}
+    {%else%}
+    {% endif %}
 {% endblock %}
 
